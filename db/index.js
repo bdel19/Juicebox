@@ -285,9 +285,24 @@ async function getPostsByTagName(tagName) {
         post => getPostById(post.id)
       ));
     } catch (error) {
+        console.log("Error in getPostsByTagName!!");
       throw error;
     }
-  } 
+}
+
+async function getAllTags() {
+    try {
+        const { rows: tags } = await client.query(`
+        SELECT * 
+        FROM tags
+        `);
+
+        return tags;
+    } catch (error) {
+        console.log("Error in getAllTags!!");
+        throw error;
+    }
+}
 
 module.exports = {
     client,
@@ -303,6 +318,7 @@ module.exports = {
     createPostTag,
     addTagsToPost,
     getPostById,
-    getPostsByTagName
+    getPostsByTagName,
+    getAllTags
 
 }
