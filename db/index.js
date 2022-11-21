@@ -1,6 +1,9 @@
 const { Client } = require('pg');
-const client = new Client('postgres://localhost:5432/juicebox-dev');
-
+const { DATABASE_URL = 'postgres://localhost:5432/juicebox-dev' } = process.env;
+const client = new Client({
+    connectionString: DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+});
 
 //----------USERS----------
 
