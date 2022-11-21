@@ -6,13 +6,17 @@ tagsRouter.use((req, res, next) => {
 
   next();
 });
-const { getAllTags } = require('../db');
+const { getAllTags, getPostsByTagName } = require('../db');
 
-tagsRouter.get('/', async (req,res) => {
-    const tags = await getAllTags();
-    res.send({
-        tags
-    });
+tagsRouter.get('/:tagName/posts', async (req,res) => {
+    const {tagName} = req.params; 
+    try{
+        const postByTags = await getPostsByTagName(tagName);
+        res.send({postByTags});
+    }catch ({name, message}){
+        next({name, message});
+    }
+
 });
 
 module.exports = tagsRouter;
