@@ -13,7 +13,8 @@ const {
   addTagsToPost,
   getPostById,
   updatePostTagsResult, 
-  getPostsByTagName
+  getPostsByTagName,
+  getUserByUsername
 } = require('./index');
   
 
@@ -77,7 +78,7 @@ async function createInitialUsers() {
     try {
       console.log("Starting to create users...");
   
-      const albert = await createUser({ username: 'albert', password: 'bertie99', name: 'Albert', location: 'Alberta' });
+      await createUser({ username: 'albert', password: 'bertie99', name: 'Albert', location: 'Alberta' });
       await createUser({ username: 'sandra', password: '2sandy4me', name: 'Sandy', location: 'Sand Iego' });
       await createUser({ username: 'glamgal', password: 'soglam', name: 'Glamdring', location: 'Gondolin' });
   
@@ -86,26 +87,13 @@ async function createInitialUsers() {
       console.error("Error creating users!");
       throw error;
     }
-}
-  
-async function rebuildDB() {
-    try {
-      client.connect();
-  
-      await dropTables();
-      await createTables();
-      await createInitialUsers();
-      await createInitialPosts();
-      await createInitialTags();
-    } catch (error) {
-      console.log("Error during rebuildDB!!")
-      throw error;
-    }
-}
+};
 
 async function createInitialPosts() {
   try{
     const [albert, sandra, glamgal] = await getAllUsers();
+
+    console.log("Starting to create posts...");
 
     await createPost({
       authorId: albert.id,
@@ -125,6 +113,7 @@ async function createInitialPosts() {
       content: "Do you even? I swear that half of you are posing.",
       tags: ["#happy", "#youcandoanything", "#canmandoeverything"]
     });
+    console.log("Finished creating posts!");
   } catch (error) {
     console.log("Error in createInitialPosts")
     throw error;
@@ -155,6 +144,20 @@ async function createInitialTags() {
   }
 }
 
+async function rebuildDB() {
+  try {
+    client.connect();
+
+    await dropTables();
+    await createTables();
+    await createInitialUsers();
+    await createInitialPosts();
+    await createInitialTags();
+  } catch (error) {
+    console.log("Error during rebuildDB!!")
+    throw error;
+  }
+}
   
 async function testDB() {
     try {
@@ -196,6 +199,10 @@ async function testDB() {
       const postsWithHappy = await getPostsByTagName("#happy");
       console.log("Result:", postsWithHappy);
 
+      console.log("calling getPostsByUser");
+      const getPostsByUserResult = await getPostsByUser(users[0].id);
+      console.log("Result:", getPostsByUserResult);
+
       console.log("Finished database test!")
     } catch (error) {
       console.error("Error testing database!");
@@ -209,4 +216,3 @@ rebuildDB()
     .finally(() => client.end());
 
 
-    
